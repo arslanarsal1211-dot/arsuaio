@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NeuroReel AI — Free AI Video Generator (up to 30 min)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060b; --panel:rgba(255,255,255,.035); --panel2:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.09); --text:#eceefb; --muted:#8b90ad;
+  --p1:#7c5cff; --p2:#00e5ff; --p3:#ff3fd8; --ok:#2ee6a8;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(720px 520px at 12% -6%, rgba(124,92,255,.22), transparent 62%),
+    radial-gradient(620px 480px at 92% 2%, rgba(0,229,255,.13), transparent 62%),
+    radial-gradient(760px 620px at 50% 112%, rgba(255,63,216,.12), transparent 62%);
+}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+/* ---------- NAV ---------- */
+nav{
+  position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(6,6,11,.72);border-bottom:1px solid var(--border);
+}
+.nav-in{max-width:1200px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:30px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.4px}
+.logo-mark{
+  width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;
+  background:linear-gradient(135deg,var(--p1),var(--p3));box-shadow:0 6px 20px rgba(124,92,255,.45)
+}
+.logo span{background:linear-gradient(90deg,#fff,#b9a8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px}
+.nav-links a{color:var(--muted);text-decoration:none;transition:.2s}
+.nav-links a:hover{color:#fff}
+.credits{
+  display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--border);
+  background:var(--panel);cursor:pointer;white-space:nowrap;
+}
+.credits b{color:var(--p2)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  border:0;cursor:pointer;font-family:inherit;font-weight:650;font-size:14px;
+  padding:11px 20px;border-radius:11px;transition:.2s;display:inline-flex;
+  align-items:center;justify-content:center;gap:8px;white-space:nowrap;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--p1),var(--p3));color:#fff;
+  box-shadow:0 10px 32px rgba(124,92,255,.38);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(124,92,255,.5)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:var(--panel);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--panel2);border-color:rgba(255,255,255,.2)}
+.btn-full{width:100%}
+
+/* ---------- HERO ---------- */
+header{padding:80px 0 56px;text-align:center}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;
+  padding:7px 15px;border-radius:999px;border:1px solid rgba(124,92,255,.35);
+  background:rgba(124,92,255,.1);color:#c9bcff;margin-bottom:24px;
+}
+h1{
+  font-size:clamp(34px,6vw,64px);line-height:1.05;letter-spacing:-2.2px;
+  font-weight:850;margin-bottom:20px;
+}
+h1 em{
+  font-style:normal;
+  background:linear-gradient(100deg,var(--p2),var(--p1) 45%,var(--p3));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{color:var(--muted);font-size:clamp(15px,2vw,18.5px);max-width:620px;margin:0 auto 34px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.stats{display:flex;gap:38px;justify-content:center;flex-wrap:wrap;margin-top:52px}
+.stat b{display:block;font-size:26px;font-weight:800;letter-spacing:-1px;
+  background:linear-gradient(135deg,#fff,#9d8bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px}
+
+/* ---------- STUDIO ---------- */
+.section-head{text-align:center;margin-bottom:38px}
+.section-head h2{font-size:clamp(26px,4vw,40px);letter-spacing:-1.4px;font-weight:800;margin-bottom:10px}
+.section-head p{color:var(--muted);font-size:15.5px}
+section{padding:64px 0;position:relative;z-index:1}
+
+.studio{
+  display:grid;grid-template-columns:400px 1fr;gap:22px;
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid var(--border);border-radius:22px;padding:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.panel{background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:16px;padding:20px}
+.field{margin-bottom:18px}
+.label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;
+  color:var(--muted);margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+.label b{color:var(--p2);font-weight:700;text-transform:none;letter-spacing:0;font-size:13px}
+textarea,input[type=text]{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:12px;padding:13px 14px;color:var(--text);font-family:inherit;
+  font-size:14px;resize:vertical;outline:none;transition:.2s;
+}
+textarea:focus,input:focus{border-color:rgba(124,92,255,.6);background:rgba(124,92,255,.07)}
+textarea{min-height:96px;line-height:1.55}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);background:var(--panel);color:var(--muted);transition:.18s;
+  user-select:none;
+}
+.chip:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.chip.on{
+  background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(255,63,216,.2));
+  border-color:rgba(124,92,255,.7);color:#fff;box-shadow:0 0 22px rgba(124,92,255,.25)
+}
+
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:6px;border-radius:99px;outline:none;
+  background:linear-gradient(90deg,var(--p1),var(--p3));cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:#fff;
+  border:3px solid var(--p1);box-shadow:0 0 14px rgba(124,92,255,.8);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--p1);cursor:pointer;
+}
+.range-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+
+.toggles{display:grid;gap:9px}
+.toggle{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 13px;border-radius:11px;border:1px solid var(--border);
+  background:var(--panel);cursor:pointer;transition:.18s;font-size:13px;
+}
+.toggle:hover{border-color:rgba(255,255,255,.22)}
+.switch{
+  width:36px;height:20px;border-radius:99px;background:rgba(255,255,255,.13);
+  position:relative;transition:.22s;flex:0 0 auto;
+}
+.switch::after{
+  content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+  background:#fff;transition:.22s;
+}
+.toggle.on .switch{background:linear-gradient(135deg,var(--p1),var(--p3))}
+.toggle.on .switch::after{transform:translateX(16px)}
+
+/* ---------- STAGE ---------- */
+.stage-col{display:flex;flex-direction:column;gap:14px}
+.stage-wrap{
+  position:relative;background:#000;border-radius:16px;overflow:hidden;
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  min-height:300px;box-shadow:inset 0 0 90px rgba(0,0,0,.9);
+}
+#stage,#result{max-width:100%;max-height:58vh;display:block}
+#result{display:none;background:#000}
+.badge-live{
+  position:absolute;top:13px;left:13px;display:flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  padding:6px 11px;border-radius:99px;background:rgba(0,0,0,.6);
+  border:1px solid var(--border);backdrop-filter:blur(10px);
+}
+.rec{width:7px;height:7px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 10px #ff3b5c;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.bar-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:9px}
+.bar-head .stage-name{color:var(--muted);font-weight:600}
+.bar-head .pct{font-weight:800;color:var(--p2);font-variant-numeric:tabular-nums}
+.bar{height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar-fill{
+  height:100%;width:0%;border-radius:99px;transition:width .18s linear;
+  background:linear-gradient(90deg,var(--p2),var(--p1),var(--p3));
+  box-shadow:0 0 18px rgba(124,92,255,.7);
+}
+.meta-row{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:11px}
+.meta-row b{color:#c9bcff;font-weight:650}
+.result-actions{display:flex;gap:10px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:2px}
+
+/* ---------- FEATURES ---------- */
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));gap:18px}
+.card{
+  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  border:1px solid var(--border);border-radius:18px;padding:24px;transition:.25s;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(124,92,255,.45);
+  box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.card .ico{
+  width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:21px;
+  background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(0,229,255,.15));
+  border:1px solid rgba(124,92,255,.3);margin-bottom:15px;
+}
+.card h3{font-size:16.5px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+.card p{font-size:13.8px;color:var(--muted);line-height:1.65}
+
+/* ---------- PIPELINE ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.step{
+  border:1px solid var(--border);border-radius:16px;padding:22px 20px;
+  background:var(--panel);position:relative;overflow:hidden;
+}
+.step::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--p2),var(--p1),var(--p3));opacity:.8;
+}
+.step .num{font-size:12px;font-weight:800;color:var(--p1);letter-spacing:1.4px;margin-bottom:9px}
+.step h4{font-size:15px;margin-bottom:7px;font-weight:700}
+.step p{font-size:13px;color:var(--muted)}
+
+/* ---------- PRICING ---------- */
+.grid3.price .card{display:flex;flex-direction:column}
+.card.hot{border-color:rgba(124,92,255,.6);box-shadow:0 0 60px rgba(124,92,255,.22);position:relative}
+.card.hot::after{
+  content:'MOST POPULAR';position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  font-size:10px;font-weight:800;letter-spacing:1.2px;padding:5px 13px;border-radius:99px;
+  background:linear-gradient(135deg,var(--p1),var(--p3));white-space:nowrap;
+}
+.price-tag{font-size:38px;font-weight:850;letter-spacing:-1.8px;margin:6px 0 4px}
+.price-tag small{font-size:14px;font-weight:600;color:var(--muted);letter-spacing:0}
+.plan-desc{font-size:13px;color:var(--muted);margin-bottom:18px}
+.plan-list{list-style:none;display:grid;gap:10px;font-size:13.5px;margin-bottom:24px}
+.plan-list li{display:flex;gap:9px;align-items:flex-start;color:#c8cbe0}
+.plan-list li::before{content:'✓';color:var(--ok);font-weight:800;flex:0 0 auto}
+.plan-list li.off{color:#5c6079}
+.plan-list li.off::before{content:'✕';color:#4a4d63}
+.card .btn{margin-top:auto}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--border);padding:40px 0;margin-top:40px;position:relative;z-index:1}
+.foot{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap;align-items:center;
+  font-size:13px;color:var(--muted)}
+.foot a{color:var(--muted);text-decoration:none;margin-left:20px}
+.foot a:hover{color:#fff}
+
+/* ---------- TOAST ---------- */
+#toast{
+  position:fixed;bottom:26px;left:50%;transform:translate(-50%,120px);
+  background:rgba(20,20,32,.96);border:1px solid var(--border);color:#fff;
+  padding:13px 22px;border-radius:13px;font-size:13.5px;font-weight:600;
+  z-index:200;transition:transform .35s cubic-bezier(.2,.9,.3,1.4);
+  backdrop-filter:blur(14px);box-shadow:0 14px 44px rgba(0,0,0,.6);max-width:90vw;text-align:center;
+}
+#toast.show{transform:translate(-50%,0)}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:940px){
+  .studio{grid-template-columns:1fr}
+  .nav-links{display:none}
+  header{padding:56px 0 40px}
+  .stats{gap:26px}
+}
+@media(max-width:520px){
+  .wrap{padding:0 16px}
+  .nav-in{padding:11px 16px;gap:14px}
+  .credits{font-size:11px;padding:5px 10px}
+  .studio{padding:14px;border-radius:18px}
+  .panel{padding:16px}
+  .foot{flex-direction:column;text-align:center}
+  .foot a{margin:0 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="nav-in">
+    <div class="logo"><div class="logo-mark">🎬</div><span>NeuroReel AI</span></div>
+    <div class="nav-links">
+      <a href="#studio">Studio</a>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="credits" id="creditsBadge" title="Click to reset demo credits">
+      <span class="dot"></span> Free <b id="creditsLeft">30</b> min left
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header>
+  <div class="wrap">
+    <div class="pill">⚡ 100% free · No watermark · No credit card</div>
+    <h1>Turn words into <em>cinematic video</em><br>up to 30 minutes long</h1>
+    <p class="sub">
+      NeuroReel AI generates full-length videos from a single prompt — with AI voiceover,
+      auto subtitles, character consistency and 4K upscaling. Render, preview and download free.
+    </p>
+    <div class="hero-cta">
+      <a href="#studio" class="btn btn-primary">🚀 Start creating free</a>
+      <a href="#how" class="btn btn-ghost">See how it works</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>30 min</b><span>Max video length</span></div>
+      <div class="stat"><b>4K</b><span>Upscale export</span></div>
+      <div class="stat"><b>32</b><span>Languages dubbed</span></div>
+      <div class="stat"><b>0</b><span>Watermarks</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ STUDIO ============ -->
+<section id="studio">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>The Studio</h2>
+      <p>Describe your video, pick a style, set the length — and render.</p>
+    </div>
+
+    <div class="studio">
+      <!-- CONTROLS -->
+      <div class="panel">
+        <div class="field">
+          <div class="label">Prompt <b id="charCount">0</b></div>
+          <textarea id="prompt" placeholder="A lone astronaut discovers a glowing ocean beneath the ice of Europa, cinematic lighting, slow dolly shots, orchestral score…"></textarea>
+          <button class="btn btn-ghost" id="surprise" style="margin-top:9px;font-size:12.5px;padding:8px 13px">🎲 Surprise me</button>
+        </div>
+
+        <div class="field">
+          <div class="label">Visual style</div>
+          <div class="chips" id="styleChips">
+            <div class="chip on" data-style="cinematic">Cinematic</div>
+            <div class="chip" data-style="anime">Anime</div>
+            <div class="chip" data-style="realistic">Realistic</div>
+            <div class="chip" data-style="3d">3D Render</div>
+            <div class="chip" data-style="cyberpunk">Cyberpunk</div>
+            <div class="chip" data-style="documentary">Documentary</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Aspect ratio</div>
+          <div class="chips" id="ratioChips">
+            <div class="chip on" data-ratio="16:9">16:9 Landscape</div>
+            <div class="chip" data-ratio="9:16">9:16 Shorts</div>
+            <div class="chip" data-ratio="1:1">1:1 Square</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Duration <b id="durLabel">5 min</b></div>
+          <input type="range" id="duration" min="1" max="30" value="5" step="1">
+          <div class="range-scale"><span>1 min</span><span>15 min</span><span>30 min</span></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Advanced features</div>
+          <div class="toggles" id="toggles">
+            <div class="toggle on" data-key="voice">🎙️ AI voiceover &amp; dubbing</div>
+            <div class="toggle on" data-key="subs">💬 Auto subtitles</div>
+            <div class="toggle" data-key="upscale">✨ 4K upscaling</div>
+            <div class="toggle" data-key="consistency">🧬 Character consistency</div>
+            <div class="toggle" data-key="music">🎵 Adaptive soundtrack</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" id="generate">✨ Generate video</button>
+      </div>
+
+      <!-- STAGE -->
+      <div class="stage-col">
+        <div class="stage-wrap">
+          <canvas id="stage" width="960" height="540"></canvas>
+          <video id="result" playsinline controls></video>
+          <div class="badge-live" id="liveBadge"><span class="rec"></span><span id="liveText">Preview</span></div>
+        </div>
+
+        <div class="panel">
+          <div class="bar-head">
+            <span class="stage-name" id="stageName">Ready to render</span>
+            <span class="pct" id="pct">0%</span>
+          </div>
+          <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+          <div class="meta-row">
+            <span>Scenes: <b id="sceneInfo">0 / 0</b></span>
+            <span>Length: <b id="lenInfo">5:00</b></span>
+            <span>Est. render: <b id="estInfo">—</b></span>
+            <span>Output: <b id="outInfo">1080p MP4</b></span>
+          </div>
+        </div>
+
+        <div class="result-actions" id="resultActions" style="display:none">
+          <button class="btn btn-primary" id="download">⬇️ Download free</button>
+          <button class="btn btn-ghost" id="again">↺ Generate again</button>
+          <button class="btn btn-ghost" id="copyLink">🔗 Copy share link</button>
+        </div>
+        <div class="note" id="stageNote">Renders are processed locally in your browser for this demo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Advanced features, zero cost</h2>
+      <p>Everything you'd pay a studio for — built into the free tier.</p>
+    </div>
+    <div class="grid3">
+      <div class="card"><div class="ico">⏱️</div><h3>True 30-minute renders</h3>
+        <p>Long-form pipeline splits your script into scenes, generates each with temporal consistency, then stitches them with seamless transitions.</p></div>
+      <div class="card"><div class="ico">🎙️</div><h3>AI voiceover &amp; dubbing</h3>
+        <p>Natural neural voices in 32 languages with automatic lip-sync alignment and emotion control per scene.</p></div>
+      <div class="card"><div class="ico">💬</div><h3>Word-level subtitles</h3>
+        <p>Auto-generated captions with frame-accurate timing. Export as burn-in, SRT or VTT with one click.</p></div>
+      <div class="card"><div class="ico">🧬</div><h3>Character consistency</h3>
+        <p>Lock a face, outfit and voice across every scene so your protagonist never changes between shots.</p></div>
+      <div class="card"><div class="ico">📱</div><h3>Smart reframe to Shorts</h3>
+        <p>One click converts a 30-minute landscape video into dozens of vertical 9:16 clips with AI face tracking.</p></div>
+      <div class="card"><div class="ico">✨</div><h3>4K upscaling &amp; grain</h3>
+        <p>Diffusion-based upscaler adds detail, film grain and motion blur for a genuine cinema finish.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>How the pipeline works</h2>
+      <p>From prompt to a downloadable 30-minute film in four stages.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num">STEP 01</div><h4>Script &amp; storyboard</h4>
+        <p>Your prompt is expanded into a full script, shot list and scene breakdown with timing.</p></div>
+      <div class="step"><div class="num">STEP 02</div><h4>Scene generation</h4>
+        <p>Each scene is rendered by the long-horizon video model with locked characters and style.</p></div>
+      <div class="step"><div class="num">STEP 03</div><h4>Audio &amp; captions</h4>
+        <p>Voiceover, adaptive soundtrack and word-level subtitles are synthesized and aligned.</p></div>
+      <div class="step"><div class="num">STEP 04</div><h4>Upscale &amp; export</h4>
+        <p>Scenes are stitched, color-graded, upscaled to 4K and encoded for watermark-free download.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Free forever. Upgrade only if you scale.</h2>
+      <p>No credit card required to start.</p>
+    </div>
+    <div class="grid3 price">
+      <div class="card">
+        <h3>Starter</h3>
+        <div class="price-tag">$0<small> / month</small></div>
+        <div class="plan-desc">Perfect for trying long-form AI video.</div>
+        <ul class="plan-list">
+          <li>30 minutes of video / month</li>
+          <li>Up to 30 min per render</li>
+          <li>1080p watermark-free export</li>
+          <li>Auto subtitles</li>
+          <li class="off">4K upscaling</li>
+          <li class="off">AI voiceover dubbing</li>
+        </ul>
+        <a href="#studio" class="btn btn-ghost btn-full">Start free</a>
+      </div>
+
+      <div class="card hot">
+        <h3>Creator</h3>
+        <div class="price-tag">$19<small> / month</small></div>
+        <div class="plan-desc">For YouTubers and content teams.</div>
+        <ul class="plan-list">
+          <li>300 minutes of video / month</li>
+          <li>Up to 30 min per render</li>
+          <li>4K upscaling &amp; film grain</li>
+          <li>AI voiceover in 32 languages</li>
+          <li>Character consistency lock</li>
+          <li>Priority render queue</li>
+        </ul>
+        <button class="btn btn-primary btn-full" onclick="toast('Demo only — no checkout wired up 🙂')">Upgrade</button>
+      </div>
+
+      <div class="card">
+        <h3>Studio</h3>
+        <div class="price-tag">$79<small> / month</small></div>
+        <div class="plan-desc">Unlimited rendering for agencies.</div>
+        <ul class="plan-list">
+          <li>Unlimited video minutes</li>
+          <li>Up to 60 min per render</li>
+          <li>API access &amp; webhooks</li>
+          <li>Team workspaces (10 seats)</li>
+          <li>Custom AI avatars</li>
+          <li>Dedicated GPU nodes</li>
+        </ul>
+        <button class="btn btn-ghost btn-full" onclick="toast('Demo only — no checkout wired up 🙂')">Contact sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot">
+    <div class="logo"><div class="logo-mark">🎬</div><span>NeuroReel AI</span></div>
+    <div>
+      <a href="#studio">Studio</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#" onclick="toast('Demo footer link');return false;">Terms</a>
+      <a href="#" onclick="toast('Demo footer link');return false;">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+   STATE
+   ========================================================= */
+const PALETTES = {
+  cinematic:   ['#080d20','#1b2a5e','#6a8dff'],
+  anime:       ['#25082a','#7a1f5c','#ff7ab8'],
+  realistic:   ['#04141a','#0b3b45','#28e0c8'],
+  '3d':        ['#06120a','#0f3d24','#3dff9e'],
+  cyberpunk:   ['#0d0221','#3a0b5c','#ff2fd0'],
+  documentary: ['#1a1206','#4a2f0a','#ffb347']
+};
+
+const state = {
+  prompt: '',
+  style: 'cinematic',
+  ratio: '16:9',
+  duration: 5,
+  credits: 30,
+  progress: 0,
+  generating: false,
+  sceneCount: 0,
+  totalScenes: 30,
+  toggles: { voice:true, subs:true, upscale:false, consistency:false, music:false }
+};
+
+let palette = PALETTES.cinematic;
+
+/* =========================================================
+   DOM
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const canvas   = $('stage');
+const ctx      = canvas.getContext('2d');
+const resultEl = $('result');
+const barFill  = $('barFill');
+const pctEl    = $('pct');
+const stageName= $('stageName');
+const promptEl = $('prompt');
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function rgba(hex, a){
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function fmtTime(mins){
+  const m = Math.floor(mins), s = Math.round((mins - m) * 60);
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+let toastTimer;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function wrapText(text, maxWidth, maxLines){
+  const words = text.split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const w of words){
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth && line){
+      lines.push(line);
+      line = w;
+      if (lines.length === maxLines) break;
+    } else line = test;
+  }
+  if (line && lines.length < maxLines) lines.push(line);
+  if (lines.length === maxLines && words.join(' ').length > lines.join(' ').length){
+    lines[maxLines-1] = lines[maxLines-1].replace(/\s+\S*$/, '') + '…';
+  }
+  return lines;
+}
+
+/* =========================================================
+   FILM GRAIN TEXTURE
+   ========================================================= */
+const noiseCanvas = document.createElement('canvas');
+noiseCanvas.width = noiseCanvas.height = 200;
+(() => {
+  const nc = noiseCanvas.getContext('2d');
+  const img = nc.createImageData(200, 200);
+  for (let i = 0; i < img.data.length; i += 4){
+    const v = Math.random() * 255;
+    img.data[i] = img.data[i+1] = img.data[i+2] = v;
+    img.data[i+3] = 16;
+  }
+  nc.putImageData(img, 0, 0);
+})();
+let grainPattern = null;
+
+/* =========================================================
+   CANVAS RENDER LOOP
+   ========================================================= */
+function draw(now){
+  const w = canvas.width, h = canvas.height;
+  const pal = palette;
+
+  // base
+  ctx.fillStyle = pal[0];
+  ctx.fillRect(0, 0, w, h);
+
+  // drifting gradient
+  const gx = w/2 + Math.sin(now * 0.00028) * w * 0.55;
+  const g  = ctx.createLinearGradient(gx, 0, w - gx, h);
+  g.addColorStop(0, pal[1]);
+  g.addColorStop(1, pal[0]);
+  ctx.globalAlpha = 0.92;
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = 1;
+
+  // glowing orbs
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 6; i++){
+    const x = w * 0.5 + Math.sin(now * 0.00042 + i * 1.9) * w * 0.38;
+    const y = h * 0.5 + Math.cos(now * 0.00051 + i * 2.7) * h * 0.34;
+    const r = Math.min(w, h) * (0.24 + 0.13 * Math.sin(now * 0.0008 + i));
+    const rg = ctx.createRadialGradient(x, y, 0, x, y, r);
+    rg.addColorStop(0, rgba(pal[2], 0.42));
+    rg.addColorStop(1, rgba(pal[2], 0));
+    ctx.fillStyle = rg;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+
+  // horizon light bar
+  const hy = h * 0.62 + Math.sin(now * 0.0006) * 12;
+  const hg = ctx.createLinearGradient(0, hy - 60, 0, hy + 60);
+  hg.addColorStop(0, rgba(pal[2], 0));
+  hg.addColorStop(0.5, rgba(pal[2], 0.16));
+  hg.addColorStop(1, rgba(pal[2], 0));
+  ctx.fillStyle = hg;
+  ctx.fillRect(0, hy - 60, w, 120);
+
+  // scanlines
+  ctx.fillStyle = 'rgba(0,0,0,0.055)';
+  for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1.4);
+
+  // grain
+  if (!grainPattern) grainPattern = ctx.createPattern(noiseCanvas, 'repeat');
+  ctx.save();
+  ctx.translate((Math.random() * 200) | 0, (Math.random() * 200) | 0);
+  ctx.fillStyle = grainPattern;
+  ctx.fillRect(-200, -200, w + 400, h + 400);
+  ctx.restore();
+
+  // vignette
+  const vg = ctx.createRadialGradient(w/2, h/2, Math.min(w,h) * 0.2, w/2, h/2, Math.max(w,h) * 0.78);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.78)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, w, h);
+
+  // ---- TEXT OVERLAY ----
+  const pad = w * 0.08;
+
+  // scene counter (top-left)
+  if (state.generating && state.sceneCount > 0){
+    ctx.font = `600 ${Math.round(w * 0.019)}px Inter, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.textAlign = 'left';
+    ctx.fillText(
+      `SCENE ${String(state.sceneCount).padStart(2,'0')} / ${String(state.totalScenes).padStart(2,'0')}`,
+      pad, pad * 0.72
+    );
+    // progress ticks
+    const tickW = w - pad * 2;
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    ctx.fillRect(pad, pad * 0.72 + 14, tickW, 2);
+    ctx.fillStyle = rgba(pal[2], 0.9);
+    ctx.fillRect(pad, pad * 0.72 + 14, tickW * state.progress, 2);
+  }
+
+  // prompt text (center)
+  const title = state.prompt || 'Your story begins here… an';
+  ctx.textAlign = 'center';
+  ctx.font = `800 ${Math.round(w * 0.048)}px Inter, sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.94)';
+  ctx.shadowColor = 'rgba(0,0,0,0.85)';
+  ctx.shadowBlur = 26;
+  const lines = wrapText(title, w - pad * 2, 3);
+  const lh = w * 0.062;
+  const startY = h / 2 - ((lines.length - 1) * lh) / 2;
+  lines.forEach((l, i) => ctx.fillText(l, w/2, startY + i * lh));
+  ctx.shadowBlur = 0;
+
+  // meta line (bottom)
+  ctx.font = `600 ${Math.round(w * 0.0185)}px Inter, sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  const label = state.style.toUpperCase() + '  ·  ' + state.ratio + '  ·  ' + state.duration + ' MIN';
+  ctx.fillText(label, w/2, h - pad * 0.6);
+}
+
+function loop(now){
+  draw(now);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* =========================================================
+   UI WIRING
+   ========================================================= */
+promptEl.addEventListener('input', e => {
+  state.prompt = e.target.value;
+  $('charCount').textContent = e.target.value.length;
+});
+
+$('surprise').addEventListener('click', () => {
+  const ideas = [
+    'A lone astronaut discovers a glowing ocean beneath the ice of Europa, cinematic lighting, slow dolly shots',
+    'A cyberpunk detective chases a rogue AI through neon-soaked Tokyo alleys at midnight, rain,amorphic flare',
+    'An epic nature documentary following snow leopards across the Himalayas through four seasons, David Attenborough style',
+    'A cozy animated short about a tiny robot who opens a bakery in a village of mice, warm pastel colours',
+    'A sweeping history of ancient Rome told through the eyes of a marble statue, dramatic orchestral score',
+    'A deep-sea expedition uncovering bioluminescent cities in the Mariana Trench, IMAX documentary style'
+  ];
+  promptEl.value = ideas[Math.floor(Math.random() * ideas.length)];
+  promptEl.dispatchEvent(new Event('input'));
+});
+
+document.querySelectorAll('#styleChips .chip').forEach(c => {
+  c.addEventListener('click', () => {
+    if (state.generating) return;
+    document.querySelectorAll('#styleChips .chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    state.style = c.dataset.style;
+    palette = PALETTES[state.style] || PALETTES.cinematic;
+  });
+});
+
+document.querySelectorAll('#ratioChips .chip').forEach(c => {
+  c.addEventListener('click', () => {
+    if (state.generating) return;
+    document.querySelectorAll('#ratioChips .chip').forEach(x => x.classList.remove('on'));
+    c.classList.add('on');
+    state.ratio = c.dataset.ratio;
+    const dims = { '16:9': [960, 540], '9:16': [540, 960], '1:1': [720, 720] };
+    const [w, h] = dims[state.ratio];
+    canvas.width = w;
+    canvas.height = h;
+    grainPattern = null;
+  });
+});
+
+$('duration').addEventListener('input', e => {
+  state.duration = +e.target.value;
+  $('durLabel').textContent = state.duration + ' min';
+  $('lenInfo').textContent = fmtTime(state.duration);
+  updateEstimate();
+});
+
+document.querySelectorAll('#toggles .toggle').forEach(t => {
+  t.addEventListener('click', () => {
+    t.classList.toggle('on');
+    state.toggles[t.dataset.key] = t.classList.contains('on');
+  });
+});
+
+$('creditsBadge').addEventListener('click', () => {
+  state.credits = 30;
+  $('creditsLeft').textContent = '30';
+  toast('Demo credits reset to 30 minutes');
+});
+
+function updateEstimate(){
+  // pretend: ~1.4 min of GPU time per minute of video
+  const mins = Math.round(state.duration * 1.4);
+  $('estInfo').textContent = mins + ' min GPU';
+  const res = state.toggles.upscale ? '4K MP4' : '1080p MP4';
+  $('outInfo').textContent = res;
+}
+updateEstimate();
+
+/* =========================================================
+   GENERATION
+   ========================================================= */
+const STAGES = [
+  [0.00, 'Analyzing prompt & writing script'],
+  [0.14, 'Generating storyboard & shot list'],
+  [0.32, 'Rendering scenes'],
+  [0.60, 'Synthesizing voiceover & soundtrack'],
+  [0.78, 'Aligning word-level subtitles'],
+  [0.88, 'Upscaling & colour grading'],
+  [0.96, 'Encoding final master']
+];
+
+function setProgress(p){
+  state.progress = p;
+  barFill.style.width = (p * 100).toFixed(1) + '%';
+  pctEl.textContent = Math.round(p * 100) + '%';
+
+  let name = STAGES[0][1];
+  for (const [th, label] of STAGES) if (p >= th) name = label;
+  stageName.textContent = name;
+
+  state.sceneCount = Math.min(state.totalScenes, Math.floor(p * state.totalScenes) + (p > 0 ? 1 : 0));
+  $('sceneInfo').textContent = `${state.sceneCount} / ${state.totalScenes}`;
+}
+
+function pickMime(){
+  const opts = [
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+    'video/mp4'
+  ];
+  for (const m of opts) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  return '';
+}
+
+async function generate(){
+  if (state.generating) return;
+
+  const prompt = promptEl.value.trim();
+  if (prompt.length < 4){
+    toast('Please describe your video first ✍️');
+    promptEl.focus();
+    return;
+  }
+  if (state.credits <= 0){
+    toast('You\'ve used your free 30 minutes. Click the credits badge to reset the demo.');
+    return;
+  }
+  if (state.credits < state.duration){
+    toast(`Only ${state.credits} free minutes left — shorten the video or reset credits.`);
+    return;
+  }
+
+  state.generating = true;
+  state.prompt = prompt;
+  $('generate').disabled = true;
+  $('generate').textContent = '⏳ Rendering…';
+  $('resultActions').style.display = 'none';
+  resultEl.style.display = 'none';
+  canvas.style.display = 'block';
+  $('liveText').textContent = 'Rendering';
+  $('liveBadge').querySelector('.rec').style.display = 'block';
+
+  // scene math: ~10 seconds per scene
+  state.totalScenes = Math.max(6, state.duration * 6);
+  setProgress(0);
+
+  // ---- start recording the canvas ----
+  let recorder = null;
+  const chunks = [];
+  const mime = pickMime();
+
+  if (window.MediaRecorder && canvas.captureStream){
+    try {
+      const stream = canvas.captureStream(30);
+      recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6_000_000 } : undefined);
+      recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      recorder.start();
+    } catch (err){
+      recorder = null;
+      console.warn('Recording unavailable:', err);
+    }
+  }
+
+  // ---- simulate the render timeline ----
+  const RECORD_MS = 9000;
+  const t0 = performance.now();
+
+  await new Promise(resolve => {
+    function tick(){
+      const p = Math.min(1, (performance.now() - t0) / RECORD_MS);
+      // ease-out so it feels like real work
+      const eased = 1 - Math.pow(1 - p, 1.7);
+      setProgress(eased);
+      if (p < 1) requestAnimationFrame(tick);
+      else resolve();
+    }
+    tick();
+  });
+
+  // ---- stop recording ----
+  let blob = null;
+  if (recorder && recorder.state !== 'inactive'){
+    const stopped = new Promise(res => { recorder.onstop = res; });
+    recorder.stop();
+    await stopped;
+    if (chunks.length) blob = new Blob(chunks, { type: mime || 'video/webm' });
+  }
+
+  setProgress(1);
+  stageName.textContent = 'Render complete ✓';
+  $('liveText').textContent = 'Preview';
+  $('liveBadge').querySelector('.rec').style.display = 'none';
+
+  // ---- show result ----
+  if (blob){
+    const url = URL.createObjectURL(blob);
+    resultEl.src = url;
+    resultEl.style.display = 'block';
+    canvas.style.display = 'none';
+    resultEl._blobUrl = url;
+    resultEl._blob = blob;
+    $('stageNote').textContent =
+      `Preview clip recorded locally (${(blob.size/1048576).toFixed(1)} MB). ` +
+      `Full ${state.duration}-minute master would render server-side.`;
+  } else {
+    $('stageNote').textContent =
+      'Your browser blocked canvas recording — the render completed but no preview file was produced.';
+  }
+
+  $('resultActions').style.display = 'flex';
+  state.credits = Math.max(0, state.credits - state.duration);
+  $('creditsLeft').textContent = state.credits;
+
+  state.generating = false;
+  $('generate').disabled = false;
+  $('generate').textContent = '✨ Generate video';
+  toast('Video ready — download it free 🎉');
+}
+
+$('generate').addEventListener('click', generate);
+
+$('download').addEventListener('click', () => {
+  if (!resultEl._blobUrl){ toast('Nothing to download yet'); return; }
+  const a = document.createElement('a');
+  a.href = resultEl._blobUrl;
+  const ext = (resultEl._blob && resultEl._blob.type.includes('mp4')) ? 'mp4' : 'webm';
+  a.download = `neuroreel-${state.style}-${state.duration}min-${Date.now()}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast('Downloading your video…');
+});
+
+$('again').addEventListener('click', () => {
+  resultEl.style.display = 'none';
+  canvas.style.display = 'block';
+  setProgress(0);
+  stageName.textContent = 'Ready to render';
+  $('resultActions').style.display = 'none';
+  $('sceneInfo').textContent = '0 / 0';
+  $('stageNote').textContent = 'Renders are processed locally in your browser for this demo.';
+  document.getElementById('studio').scrollIntoView({ behavior: 'smooth' });
+});
+
+$('copyLink').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    toast('Share link copied to clipboard 🔗');
+  } catch {
+    toast('Copy failed — your browser blocked clipboard access');
+  }
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+$('lenInfo').textContent = fmtTime(state.duration);
+$('durLabel').textContent = state.duration + ' min';
+setProgress(0);
+</script>
+</body>
+</html>
